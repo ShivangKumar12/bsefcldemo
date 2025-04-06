@@ -5,6 +5,7 @@ export interface FirebaseUser {
   username: string;
   fullName: string;
   email: string;
+  mobile?: string;
   registrationId: string;
   address: string;
   phone: string;
@@ -14,6 +15,21 @@ export interface FirebaseUser {
   graduationDate: string;
   created_at: string;
   updated_at: string;
+}
+
+// Type for creating a new Firebase user - all fields except the basic ones are optional
+export interface CreateFirebaseUser {
+  username: string;
+  fullName: string;
+  email: string;
+  mobile?: string;
+  registrationId?: string;
+  address?: string;
+  phone?: string;
+  course?: string;
+  institute?: string;
+  enrollmentDate?: string;
+  graduationDate?: string;
 }
 
 export interface FirebaseLoanDetails {

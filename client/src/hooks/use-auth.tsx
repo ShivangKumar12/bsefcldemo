@@ -54,13 +54,14 @@ type RegisterData = {
   password: string;
   fullName: string;
   email: string;
-  registrationId: string;
-  address: string;
-  phone: string;
-  course: string;
-  institute: string;
-  enrollmentDate: string;
-  graduationDate: string;
+  mobile: string;
+  registrationId?: string;
+  address?: string;
+  phone?: string;
+  course?: string;
+  institute?: string;
+  enrollmentDate?: string;
+  graduationDate?: string;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -128,14 +129,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { email, password, ...otherUserData } = userData;
       // Use email for authentication but preserve username for display
       const firebaseUser = await firebaseService.registerUser(email, password, {
-        ...otherUserData,
         username: userData.username,
         email,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        fullName: userData.fullName,
+        mobile: userData.mobile,
+        // Other optional fields will be filled with defaults in the service
       });
       
-      return convertFirebaseUserToUser(firebaseUser as FirebaseUser);
+      return convertFirebaseUserToUser(firebaseUser);
     },
     onSuccess: (userData: User) => {
       setCurrentUser(userData);

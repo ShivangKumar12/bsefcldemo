@@ -18,12 +18,13 @@ import type {
   FirebaseLoanDetails, 
   FirebaseDisbursementDetails, 
   FirebaseRepaymentSchedule,
-  FirebaseDashboardData
+  FirebaseDashboardData,
+  CreateFirebaseUser
 } from '../types/firebase';
 
 class FirebaseService {
   // Authentication methods
-  async registerUser(email: string, password: string, userData: Omit<FirebaseUser, 'id'>) {
+  async registerUser(email: string, password: string, userData: CreateFirebaseUser) {
     try {
       // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -31,18 +32,85 @@ class FirebaseService {
       
       // Create user profile in Firestore
       const userRef = doc(db, 'users', user.uid);
-      await setDoc(userRef, {
+      const userProfile = {
         ...userData,
         id: user.uid,
+        registrationId: userData.registrationId || 'STU' + Math.floor(100000 + Math.random() * 900000),
+        address: userData.address || 'Sample Address, Patna, Bihar',
+        phone: userData.phone || userData.mobile || '',
+        course: userData.course || 'B.Tech',
+        institute: userData.institute || 'NIT Patna',
+        enrollmentDate: userData.enrollmentDate || '2023-07-15',
+        graduationDate: userData.graduationDate || '2027-06-30',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      });
+      };
+      
+      await setDoc(userRef, userProfile);
+      
+      // Create sample loan details
+      const loanDetailsRef = doc(db, 'loanDetails', user.uid);
+      const loanDetails = {
+        id: loanDetailsRef.id,
+        userId: user.uid,
+        loanAmount: 200000,
+        loanTerm: 60,
+        interestRate: 7.5,
+        monthlyPayment: 4000,
+        totalInterest: 40000,
+        loanPurpose: 'Higher Education',
+        loanStatus: 'APPROVED',
+        approvalDate: '2023-08-15',
+        disbursementDate: '2023-08-30',
+        nextPaymentDate: '2028-09-30',
+        totalPaid: 20000,
+        remainingBalance: 220000,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      await setDoc(loanDetailsRef, loanDetails);
+      
+      // Create sample disbursement details
+      const disbursementRef = doc(db, 'disbursementDetails', user.uid);
+      const disbursementDetails = {
+        id: disbursementRef.id,
+        userId: user.uid,
+        disbursementId: 'DISB' + Math.floor(10000 + Math.random() * 90000),
+        disbursementDate: '2023-08-30',
+        disbursementAmount: 200000,
+        bankName: 'State Bank of India',
+        accountNumber: 'XXXX' + Math.floor(1000 + Math.random() * 9000),
+        transactionId: 'TXN' + Math.floor(100000 + Math.random() * 900000),
+        status: 'COMPLETED',
+        remarks: 'First disbursement for academic year 2023-24',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      await setDoc(disbursementRef, disbursementDetails);
+      
+      // Create sample repayment schedule
+      for (let i = 1; i <= 5; i++) {
+        const repaymentRef = doc(collection(db, 'repaymentSchedule'));
+        const paymentStatus = i <= 2 ? 'PAID' : (i === 3 ? 'PENDING' : 'UPCOMING');
+        const repaymentSchedule = {
+          id: repaymentRef.id,
+          userId: user.uid,
+          loanId: loanDetailsRef.id,
+          paymentNumber: i,
+          paymentDate: `2028-${i + 4}-15`,
+          paymentAmount: 4000,
+          principalAmount: 3500,
+          interestAmount: 500,
+          paymentStatus: paymentStatus,
+          remarks: `Installment ${i}`,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        await setDoc(repaymentRef, repaymentSchedule);
+      }
       
       // Return user data
-      return {
-        ...userData,
-        id: user.uid
-      };
+      return userProfile;
     } catch (error) {
       console.error('Error registering user:', error);
       throw error;
