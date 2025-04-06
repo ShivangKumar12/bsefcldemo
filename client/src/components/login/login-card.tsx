@@ -4,13 +4,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { Eye, EyeOff, LogIn } from "lucide-react";
+import { Eye, EyeOff, LogIn, GraduationCap, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { apiRequest } from "@/lib/queryClient";
+import educationFinanceImage from "@/assets/education-finance.jpg";
 
 const formSchema = z.object({
   username: z.string().min(1, {
@@ -62,25 +63,42 @@ const LoginCard = () => {
   };
 
   return (
-    <Card className="overflow-hidden animate-in fade-in-50 duration-300">
-      <CardHeader className="bg-gradient-to-r from-primary to-primary-400 py-4 px-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-white font-semibold text-lg">
-            {t('login.title')}
-          </h2>
+    <Card className="overflow-hidden shadow-lg animate-in fade-in-50 duration-300">
+      {/* Top image */}
+      <div className="relative">
+        <div className="h-32 w-full overflow-hidden">
+          <img 
+            src={educationFinanceImage} 
+            alt="Education Finance" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 p-4 text-white">
+            <div className="flex items-center">
+              <GraduationCap className="mr-2 h-5 w-5" />
+              <h2 className="text-xl font-bold">{t('login.title')}</h2>
+            </div>
+            <p className="text-xs text-blue-100">Bihar State Education Finance Corporation Ltd.</p>
+          </div>
+        </div>
+      </div>
+
+      <CardHeader className="bg-white border-b pt-4 pb-2 px-6">
+        <div className="flex justify-end items-center">
           <div className="flex items-center">
             <Button 
-              variant={i18n.language === 'hi' ? 'secondary' : 'ghost'} 
+              variant="ghost" 
               size="sm" 
-              className={i18n.language === 'hi' ? 'text-primary font-medium' : 'text-white hover:text-white hover:bg-primary-800'} 
+              className={i18n.language === 'hi' ? 'text-primary bg-blue-50' : 'text-gray-600'} 
               onClick={toggleLanguage}
             >
               {t('language.hindi')}
             </Button>
+            <span className="mx-1 text-gray-400">|</span>
             <Button 
-              variant={i18n.language === 'en' ? 'secondary' : 'ghost'} 
+              variant="ghost" 
               size="sm" 
-              className={i18n.language === 'en' ? 'text-primary font-medium ml-1' : 'text-white hover:text-white hover:bg-primary-800 ml-1'} 
+              className={i18n.language === 'en' ? 'text-primary bg-blue-50' : 'text-gray-600'} 
               onClick={toggleLanguage}
             >
               {t('language.english')}
@@ -97,12 +115,12 @@ const LoginCard = () => {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('login.username')}</FormLabel>
+                  <FormLabel className="text-gray-700">{t('login.username')}</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder={t('login.usernamePlaceholder')} 
                       {...field} 
-                      className="py-5"
+                      className="py-5 border-gray-300 focus:border-primary"
                     />
                   </FormControl>
                   <FormMessage />
@@ -115,14 +133,14 @@ const LoginCard = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('login.password')}</FormLabel>
+                  <FormLabel className="text-gray-700">{t('login.password')}</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input 
                         type={showPassword ? "text" : "password"}
                         placeholder={t('login.passwordPlaceholder')}
                         {...field}
-                        className="py-5"
+                        className="py-5 border-gray-300 focus:border-primary"
                       />
                       <Button
                         type="button"
@@ -143,7 +161,7 @@ const LoginCard = () => {
             <div className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
-                className="w-full bg-primary hover:bg-primary-700 text-white font-medium py-5"
+                className="w-full bg-primary hover:bg-primary-700 text-white font-medium py-6 rounded-md"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -159,11 +177,11 @@ const LoginCard = () => {
                 )}
               </Button>
               
-              <div className="flex justify-between items-center">
-                <Button variant="link" className="text-primary p-0 h-auto font-medium">
+              <div className="flex justify-between items-center pt-2">
+                <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm">
                   {t('login.forgotPassword')}
                 </Button>
-                <Button variant="link" className="text-primary p-0 h-auto font-medium">
+                <Button variant="link" className="text-primary p-0 h-auto font-medium text-sm">
                   {t('login.newRegistration')}
                 </Button>
               </div>
@@ -172,26 +190,43 @@ const LoginCard = () => {
         </Form>
         
         {/* Help Section */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">
-            {t('login.needHelp')}
-          </h3>
-          <div className="space-y-2">
-            <div className="flex items-center text-xs text-gray-600">
-              <span className="text-primary mr-2">📞</span>
-              <span>{t('login.helpline')}: 0612-2230092</span>
-            </div>
-            <div className="flex items-center text-xs text-gray-600">
-              <span className="text-primary mr-2">✉️</span>
-              <span>{t('login.email')}: support@bsefcl.in</span>
-            </div>
-            <div className="flex items-center text-xs text-gray-600">
-              <span className="text-primary mr-2">🕒</span>
-              <span>{t('login.workingHours')}</span>
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="flex items-start">
+              <Info className="h-5 w-5 text-blue-500 mt-0.5 mr-2" />
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                  {t('login.needHelp')}
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-center text-xs text-gray-600">
+                    <span className="text-primary mr-2">📞</span>
+                    <span>{t('login.helpline')}: 0612-2230092</span>
+                  </div>
+                  <div className="flex items-center text-xs text-gray-600">
+                    <span className="text-primary mr-2">✉️</span>
+                    <span>{t('login.email')}: support@bsefcl.in</span>
+                  </div>
+                  <div className="flex items-center text-xs text-gray-600">
+                    <span className="text-primary mr-2">🕒</span>
+                    <span>{t('login.workingHours')}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </CardContent>
+      
+      <CardFooter className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <a 
+          href="#about" 
+          className="text-xs text-gray-500 hover:text-primary transition-colors flex items-center mx-auto"
+        >
+          <Info className="mr-1 h-3 w-3" />
+          Learn more about student loans and eligibility
+        </a>
+      </CardFooter>
     </Card>
   );
 };
