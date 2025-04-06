@@ -56,37 +56,77 @@ export default function DashboardPage() {
       <DashboardHeader fullName={dashboardData?.profile?.fullName || "Student"} />
       
       <main className="container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-primary">Welcome, {dashboardData?.profile?.fullName || "Student"}</h1>
-          <p className="text-gray-600">Registration Id: {dashboardData?.profile?.registrationId || "6172140"}</p>
+        <div className="mb-6 bg-white p-4 border border-gray-200 rounded-lg shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-primary">Welcome, {dashboardData?.profile?.fullName || "Student"}</h1>
+              <p className="text-gray-600">Registration Id: {dashboardData?.profile?.registrationId || "6172140"}</p>
+            </div>
+            <div className="bg-blue-50 p-3 rounded-lg flex items-center border border-blue-100">
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Last Login</p>
+                <p className="text-sm font-semibold text-gray-700">{new Date().toLocaleDateString()}</p>
+              </div>
+            </div>
+          </div>
         </div>
         
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="mb-4 w-full border border-gray-200 rounded-md justify-start">
-            <TabsTrigger value="profile" className="data-[state=active]:bg-primary data-[state=active]:text-white">Profile Summary</TabsTrigger>
-            <TabsTrigger value="account" className="data-[state=active]:bg-primary data-[state=active]:text-white">Account Summary</TabsTrigger>
-            <TabsTrigger value="track" className="data-[state=active]:bg-primary data-[state=active]:text-white">Track Loan Status</TabsTrigger>
-            <TabsTrigger value="disbursement" className="data-[state=active]:bg-primary data-[state=active]:text-white">Disbursement Details</TabsTrigger>
-            <TabsTrigger value="repayment" className="data-[state=active]:bg-primary data-[state=active]:text-white">Repayment Status</TabsTrigger>
+          <TabsList className="w-full bg-gray-50 p-1 border border-gray-200 rounded-md justify-start overflow-x-auto">
+            <TabsTrigger 
+              value="profile" 
+              className="py-2.5 px-4 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium"
+            >
+              Profile Summary
+            </TabsTrigger>
+            <TabsTrigger 
+              value="account" 
+              className="py-2.5 px-4 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium"
+            >
+              Account Summary
+            </TabsTrigger>
+            <TabsTrigger 
+              value="track" 
+              className="py-2.5 px-4 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium"
+            >
+              Track Loan Status
+            </TabsTrigger>
+            <TabsTrigger 
+              value="disbursement" 
+              className="py-2.5 px-4 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium"
+            >
+              Disbursement Details
+            </TabsTrigger>
+            <TabsTrigger 
+              value="repayment" 
+              className="py-2.5 px-4 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:font-medium"
+            >
+              Repayment Status
+            </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="profile" className="border border-gray-200 rounded-lg p-6 bg-white">
+          <TabsContent value="profile" className="mt-4 border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
+            <h2 className="text-xl font-semibold text-primary mb-4 pb-2 border-b">Profile Information</h2>
             <ProfileCard profile={dashboardData?.profile} />
           </TabsContent>
           
-          <TabsContent value="account" className="border border-gray-200 rounded-lg p-6 bg-white">
+          <TabsContent value="account" className="mt-4 border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
+            <h2 className="text-xl font-semibold text-primary mb-4 pb-2 border-b">Account Summary</h2>
             <AccountSummary loanDetails={dashboardData?.loanDetails} />
           </TabsContent>
           
-          <TabsContent value="track" className="border border-gray-200 rounded-lg p-6 bg-white">
+          <TabsContent value="track" className="mt-4 border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
+            <h2 className="text-xl font-semibold text-primary mb-4 pb-2 border-b">Loan Application Status</h2>
             <ApplicationStatus />
           </TabsContent>
           
-          <TabsContent value="disbursement" className="border border-gray-200 rounded-lg p-6 bg-white">
+          <TabsContent value="disbursement" className="mt-4 border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
+            <h2 className="text-xl font-semibold text-primary mb-4 pb-2 border-b">Disbursement Details</h2>
             <DisbursementDetails disbursementDetails={dashboardData?.disbursementDetails} />
           </TabsContent>
           
-          <TabsContent value="repayment" className="border border-gray-200 rounded-lg p-6 bg-white">
+          <TabsContent value="repayment" className="mt-4 border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
+            <h2 className="text-xl font-semibold text-primary mb-4 pb-2 border-b">Repayment Schedule</h2>
             <RepaymentStatus 
               loanDetails={dashboardData?.loanDetails} 
               repaymentSchedule={dashboardData?.repaymentSchedule} 
