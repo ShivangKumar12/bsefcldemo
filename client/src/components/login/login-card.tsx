@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { apiRequest } from "@/lib/queryClient";
 import educationFinanceImage from "@/assets/education-finance.jpg";
+import { useAuth } from "@/hooks/use-auth";
 
 const formSchema = z.object({
   username: z.string().min(1, {
@@ -29,7 +29,8 @@ const LoginCard = () => {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { loginMutation } = useAuth();
+  const isLoading = loginMutation.isPending;
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -40,21 +41,19 @@ const LoginCard = () => {
   });
 
   const onSubmit = async (data: FormValues) => {
-    setIsLoading(true);
-    
-    try {
-      await apiRequest("POST", "/api/login", data);
-      // On successful login, redirect to dashboard
-      setLocation("/dashboard");
-    } catch (error) {
-      toast({
-        title: t('login.errorTitle'),
-        description: t('login.errorMessage'),
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    loginMutation.mutate(data, {
+      onSuccess: () => {
+        // On successful login, redirect to dashboard
+        setLocation("/dashboard");
+      },
+      onError: (error) => {
+        toast({
+          title: t('login.errorTitle'),
+          description: error.message || t('login.errorMessage'),
+          variant: "destructive",
+        });
+      }
+    });
   };
 
   const toggleLanguage = () => {

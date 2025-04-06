@@ -6,12 +6,13 @@ import NotFound from "@/pages/not-found";
 import LoginPage from "@/pages/login-page";
 import DashboardPage from "@/pages/dashboard-page";
 import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/lib/protected-route";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={LoginPage} />
-      <Route path="/dashboard" component={DashboardPage} />
+      <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <Route component={NotFound} />
     </Switch>
   );

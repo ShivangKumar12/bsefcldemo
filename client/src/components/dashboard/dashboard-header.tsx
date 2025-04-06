@@ -39,9 +39,9 @@ export default function DashboardHeader({ fullName }: DashboardHeaderProps) {
           
           {/* Logout button */}
           <Button 
-            variant="outline" 
+            variant="secondary" 
             size="sm"
-            className="border-white text-white hover:bg-blue-700"
+            className="bg-red-600 text-white hover:bg-red-700 shadow-sm border-0"
             onClick={handleLogout}
           >
             <LogOut className="w-4 h-4 mr-1" />

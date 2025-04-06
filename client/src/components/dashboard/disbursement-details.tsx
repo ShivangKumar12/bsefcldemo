@@ -1,9 +1,9 @@
-import { DisbursementDetails as DisbursementDetailsType } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { FirebaseDisbursementDetails } from "@/types/firebase";
 
 interface DisbursementDetailsProps {
-  disbursementDetails?: DisbursementDetailsType;
+  disbursementDetails?: FirebaseDisbursementDetails;
 }
 
 export default function DisbursementDetails({ disbursementDetails }: DisbursementDetailsProps) {
@@ -31,14 +31,14 @@ export default function DisbursementDetails({ disbursementDetails }: Disbursemen
             <TableBody>
               <TableRow>
                 <TableCell>{disbursementDetails.disbursementDate}</TableCell>
-                <TableCell>₹{disbursementDetails.loanDisbursed}</TableCell>
+                <TableCell>₹{disbursementDetails.disbursementAmount.toLocaleString('en-IN')}</TableCell>
                 <TableCell>1st Semester</TableCell>
                 <TableCell>{disbursementDetails.status}</TableCell>
-                <TableCell>{disbursementDetails.modeOfPayment}</TableCell>
+                <TableCell>NEFT/RTGS</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="font-bold">Total</TableCell>
-                <TableCell className="font-bold">₹{disbursementDetails.loanDisbursed}</TableCell>
+                <TableCell className="font-bold">₹{disbursementDetails.disbursementAmount.toLocaleString('en-IN')}</TableCell>
                 <TableCell></TableCell>
                 <TableCell></TableCell>
                 <TableCell></TableCell>
@@ -64,10 +64,10 @@ export default function DisbursementDetails({ disbursementDetails }: Disbursemen
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell>{disbursementDetails.beneficiaryName}</TableCell>
-                <TableCell>{disbursementDetails.accountNo}</TableCell>
-                <TableCell>{disbursementDetails.ifscCode}</TableCell>
-                <TableCell>{disbursementDetails.utrDdNo}</TableCell>
+                <TableCell>{disbursementDetails.bankName}</TableCell>
+                <TableCell>{disbursementDetails.accountNumber}</TableCell>
+                <TableCell>SBIN0011259</TableCell>
+                <TableCell>{disbursementDetails.transactionId}</TableCell>
               </TableRow>
             </TableBody>
           </Table>

@@ -1,13 +1,13 @@
-import { LoanDetails, RepaymentSchedule } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { InfoIcon } from "lucide-react";
+import { FirebaseLoanDetails, FirebaseRepaymentSchedule } from "@/types/firebase";
 
 interface RepaymentStatusProps {
-  loanDetails?: LoanDetails;
-  repaymentSchedule?: RepaymentSchedule[];
+  loanDetails?: FirebaseLoanDetails;
+  repaymentSchedule?: FirebaseRepaymentSchedule[];
 }
 
 export default function RepaymentStatus({ loanDetails, repaymentSchedule }: RepaymentStatusProps) {
@@ -15,11 +15,11 @@ export default function RepaymentStatus({ loanDetails, repaymentSchedule }: Repa
     return <div>Loading repayment data...</div>;
   }
 
-  // Calculate some values as they're not in the schema
-  const interestRate = 1.5; // 1.5% assumed interest rate
-  const totalInterest = "17142.00"; // Example calculated interest
-  const amountRepaid = "0.00"; // Assuming no repayments yet
-  const outstandingAmount = loanDetails.loanDisbursed; // Full loan amount
+  // Use values from Firebase
+  const interestRate = loanDetails.interestRate;
+  const totalInterest = loanDetails.totalInterest.toLocaleString('en-IN');
+  const amountRepaid = loanDetails.totalPaid.toLocaleString('en-IN');
+  const outstandingAmount = loanDetails.remainingBalance.toLocaleString('en-IN');
 
   return (
     <div className="space-y-6">
@@ -34,22 +34,22 @@ export default function RepaymentStatus({ loanDetails, repaymentSchedule }: Repa
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Loan Account Number</span>
-                  <span className="font-medium">{loanDetails.loanAccountNumber}</span>
+                  <span className="font-medium">{loanDetails.id}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
                   <span className="text-gray-600">Sanctioned Amount</span>
-                  <span className="font-medium">₹{loanDetails.loanSanctioned}</span>
+                  <span className="font-medium">₹{loanDetails.loanAmount.toLocaleString('en-IN')}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
                   <span className="text-gray-600">Disbursed Amount</span>
-                  <span className="font-medium">₹{loanDetails.loanDisbursed}</span>
+                  <span className="font-medium">₹{loanDetails.loanAmount.toLocaleString('en-IN')}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
                   <span className="text-gray-600">Repayment Tenure</span>
-                  <span className="font-medium">{loanDetails.repaymentTenure} months</span>
+                  <span className="font-medium">{loanDetails.loanTerm} months</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
@@ -64,7 +64,7 @@ export default function RepaymentStatus({ loanDetails, repaymentSchedule }: Repa
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Principal</span>
-                  <span className="font-medium">₹{loanDetails.loanDisbursed}</span>
+                  <span className="font-medium">₹{loanDetails.loanAmount.toLocaleString('en-IN')}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
@@ -84,7 +84,7 @@ export default function RepaymentStatus({ loanDetails, repaymentSchedule }: Repa
                 <Separator />
                 <div className="flex justify-between">
                   <span className="text-gray-600">Next Payment Due</span>
-                  <span className="font-medium text-red-600">{loanDetails.nextDueDate || "After Moratorium"}</span>
+                  <span className="font-medium text-red-600">{loanDetails.nextPaymentDate}</span>
                 </div>
               </div>
             </div>
@@ -122,20 +122,19 @@ export default function RepaymentStatus({ loanDetails, repaymentSchedule }: Repa
             <TableBody>
               {repaymentSchedule.map((payment, index) => (
                 <TableRow key={index}>
-                  <TableCell>{payment.installmentNumber}</TableCell>
-                  <TableCell>{payment.installmentDate}</TableCell>
-                  <TableCell>₹{payment.principalAmount}</TableCell>
-                  <TableCell>₹{payment.monthlyInstallmentAmount}</TableCell>
+                  <TableCell>{payment.paymentNumber}</TableCell>
+                  <TableCell>{payment.paymentDate}</TableCell>
+                  <TableCell>₹{payment.principalAmount.toLocaleString('en-IN')}</TableCell>
+                  <TableCell>₹{payment.paymentAmount.toLocaleString('en-IN')}</TableCell>
                   <TableCell>
                     <Badge 
                       variant={
-                        payment.paymentStatus === 'Y' ? 'success' : 
-                        payment.paymentStatus === 'P' ? 'default' : 
+                        payment.paymentStatus === 'PAID' ? 'success' : 
+                        payment.paymentStatus === 'PENDING' ? 'default' : 
                         'destructive'
                       }
                     >
-                      {payment.paymentStatus === 'Y' ? 'PAID' : 
-                       payment.paymentStatus === 'P' ? 'PENDING' : 'OVERDUE'}
+                      {payment.paymentStatus}
                     </Badge>
                   </TableCell>
                 </TableRow>

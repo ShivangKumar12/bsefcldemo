@@ -3,6 +3,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { firebaseService } from "@/services/firebase-service";
+import type { FirebaseDashboardData } from "@/types/firebase";
 
 // Dashboard components
 import ProfileCard from "@/components/dashboard/profile-card";
@@ -15,13 +19,39 @@ import DashboardHeader from "@/components/dashboard/dashboard-header";
 export default function DashboardPage() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  
-  // Fetch all dashboard data
-  const { data: dashboardData, isLoading, error } = useQuery({
-    queryKey: ["/api/dashboard-data"],
-    retry: 1,
-    refetchOnWindowFocus: false
-  });
+  const { user, isLoading: authLoading } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [dashboardData, setDashboardData] = useState<FirebaseDashboardData | null>(null);
+
+  // Fetch dashboard data from Firebase
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!user) {
+        setError(new Error("User not authenticated"));
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        // In a real app, we would use the user's ID to get their data
+        // For now, we'll use a hardcoded ID for testing
+        const userId = user.id.toString();
+        const data = await firebaseService.getDashboardData(userId);
+        setDashboardData(data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+        setError(err as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (!authLoading) {
+      fetchDashboardData();
+    }
+  }, [user, authLoading]);
 
   if (isLoading) {
     return (

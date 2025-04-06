@@ -1,11 +1,11 @@
-import { LoanDetails } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FileDownIcon } from "lucide-react";
+import { FirebaseLoanDetails } from "@/types/firebase";
 
 interface AccountSummaryProps {
-  loanDetails?: LoanDetails;
+  loanDetails?: FirebaseLoanDetails;
 }
 
 export default function AccountSummary({ loanDetails }: AccountSummaryProps) {
@@ -31,15 +31,15 @@ export default function AccountSummary({ loanDetails }: AccountSummaryProps) {
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell>{loanDetails.loanAccountNumber}</TableCell>
-                <TableCell>₹{loanDetails.loanSanctioned}</TableCell>
-                <TableCell>₹{loanDetails.loanDisbursed}</TableCell>
-                <TableCell>{loanDetails.repaymentTenure}</TableCell>
+                <TableCell>{loanDetails.id}</TableCell>
+                <TableCell>₹{loanDetails.loanAmount.toLocaleString('en-IN')}</TableCell>
+                <TableCell>₹{(loanDetails.loanAmount - loanDetails.remainingBalance).toLocaleString('en-IN')}</TableCell>
+                <TableCell>{loanDetails.loanTerm}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="font-bold">Total</TableCell>
-                <TableCell className="font-bold">₹{loanDetails.loanSanctioned}</TableCell>
-                <TableCell className="font-bold">₹{loanDetails.loanDisbursed}</TableCell>
+                <TableCell className="font-bold">₹{loanDetails.loanAmount.toLocaleString('en-IN')}</TableCell>
+                <TableCell className="font-bold">₹{(loanDetails.loanAmount - loanDetails.remainingBalance).toLocaleString('en-IN')}</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             </TableBody>

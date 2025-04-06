@@ -1,8 +1,8 @@
-import { User } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FirebaseUser } from "@/types/firebase";
 
 interface ProfileCardProps {
-  profile?: User;
+  profile?: FirebaseUser;
 }
 
 export default function ProfileCard({ profile }: ProfileCardProps) {
@@ -18,41 +18,14 @@ export default function ProfileCard({ profile }: ProfileCardProps) {
       <CardContent className="p-0">
         <div className="divide-y divide-gray-200">
           <ProfileField label="Name" value={profile.fullName} />
-          <ProfileField label="Address" value={profile.address || "S/O: MUNNA KUMAR, ROAD NO-8, NARAYANI NAGAR SANCHIPATTI, HAJIPUR HAJIPUR"} />
-          <ProfileField label="Phone number" value={profile.mobile} />
+          <ProfileField label="Address" value={profile.address} />
+          <ProfileField label="Phone number" value={profile.phone} />
           <ProfileField label="Email id" value={profile.email} />
-          <ProfileField 
-            label="Co-Applicant Name" 
-            value={profile.coApplicantName || "MUNNA KUMAR"} 
-          />
-          <ProfileField 
-            label="Co-Applicant Address" 
-            value={profile.coApplicantAddress || "ROAD NO.8, NARAYANI NAGAR, SANCHIPATTI, HAJIPUR, VAISHALI, BIHAR"} 
-          />
-          <ProfileField 
-            label="Co-Applicant Contact Number" 
-            value={profile.coApplicantContact || "9931286972"} 
-          />
-          <ProfileField 
-            label="Applied Institute Name" 
-            value={profile.instituteName || "CHANDIGARH ENGINEERING COLLEGE"} 
-          />
-          <ProfileField 
-            label="Address of Institute" 
-            value={profile.instituteAddress || "LANDRAN, KHARAR-BANUR HIGHWAY, SECTOR-112, GREATER MOHALI, PUNJABLANDRAN, MOHALI-140307(PUNJAB)"} 
-          />
-          <ProfileField 
-            label="Institute Contact Number" 
-            value={profile.instituteContact || "1723984200"} 
-          />
-          <ProfileField 
-            label="Applied Course" 
-            value={profile.appliedCourse || "B.TECH B.E. B.SC-COMPUTER SCIENCE AND ENGINEERING"} 
-          />
-          <ProfileField 
-            label="Duration of Course (In Months)" 
-            value={String(profile.courseDuration || "48")} 
-          />
+          <ProfileField label="Registration ID" value={profile.registrationId} />
+          <ProfileField label="Institute" value={profile.institute} />
+          <ProfileField label="Course" value={profile.course} />
+          <ProfileField label="Enrollment Date" value={profile.enrollmentDate} />
+          <ProfileField label="Graduation Date" value={profile.graduationDate} />
         </div>
       </CardContent>
     </Card>
