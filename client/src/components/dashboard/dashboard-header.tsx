@@ -1,6 +1,6 @@
-import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BellIcon, LogOut } from "lucide-react";
+import { useLocation } from "wouter";
 import headerLogo from "@assets/219-2196137_bihar-government-logo-bihar-government-logo-png-transparent.png";
 
 interface DashboardHeaderProps {
@@ -8,10 +8,17 @@ interface DashboardHeaderProps {
 }
 
 export default function DashboardHeader({ fullName }: DashboardHeaderProps) {
-  const { logoutMutation } = useAuth();
+  const [, setLocation] = useLocation();
   
   const handleLogout = () => {
-    logoutMutation.mutate();
+    // Make logout request
+    fetch("/api/logout", {
+      method: "POST",
+      credentials: "include"
+    }).then(() => {
+      // Redirect to login page
+      setLocation("/");
+    });
   };
   
   return (

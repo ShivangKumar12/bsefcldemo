@@ -1,7 +1,6 @@
-import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Redirect } from "wouter";
+import { useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 
@@ -14,20 +13,15 @@ import ApplicationStatus from "@/components/dashboard/application-status";
 import DashboardHeader from "@/components/dashboard/dashboard-header";
 
 export default function DashboardPage() {
-  const { user } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   
   // Fetch all dashboard data
   const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ["/api/dashboard-data"],
     retry: 1,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: false
   });
-
-  // Redirect to login if not authenticated
-  if (!user) {
-    return <Redirect to="/auth" />;
-  }
 
   if (isLoading) {
     return (
@@ -38,22 +32,33 @@ export default function DashboardPage() {
   }
 
   if (error) {
+    // Show error and redirect to login page after a delay
+    toast({
+      title: "Authentication Error",
+      description: "Please log in to access the dashboard",
+      variant: "destructive"
+    });
+    
+    // Redirect to login page after a short delay
+    setTimeout(() => setLocation("/"), 2000);
+    
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <h1 className="text-2xl font-bold text-red-500">Error loading dashboard</h1>
         <p className="text-gray-600">{error.message}</p>
+        <p className="mt-4">Redirecting to login page...</p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <DashboardHeader fullName={user.fullName} />
+      <DashboardHeader fullName={dashboardData?.profile?.fullName || "Student"} />
       
       <main className="container mx-auto px-4 py-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-primary">Welcome, {user.fullName}</h1>
-          <p className="text-gray-600">Registration Id: {dashboardData?.profile.registrationId || "6172140"}</p>
+          <h1 className="text-2xl font-bold text-primary">Welcome, {dashboardData?.profile?.fullName || "Student"}</h1>
+          <p className="text-gray-600">Registration Id: {dashboardData?.profile?.registrationId || "6172140"}</p>
         </div>
         
         <Tabs defaultValue="profile" className="w-full">
