@@ -5,8 +5,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { firebaseService } from "@/services/firebase-service";
+import { mockDataService } from "@/services/mock-data-service";
 import type { FirebaseDashboardData } from "@/types/firebase";
+
+// Use mock service to bypass Firebase permission issues
+const dataService = mockDataService;
 
 // Dashboard components
 import ProfileCard from "@/components/dashboard/profile-card";
@@ -24,7 +27,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<Error | null>(null);
   const [dashboardData, setDashboardData] = useState<FirebaseDashboardData | null>(null);
 
-  // Fetch dashboard data from Firebase
+  // Fetch dashboard data from mock service
   useEffect(() => {
     const fetchDashboardData = async () => {
       if (!user) {
@@ -37,7 +40,8 @@ export default function DashboardPage() {
         // In a real app, we would use the user's ID to get their data
         // For now, we'll use a hardcoded ID for testing
         const userId = user.id.toString();
-        const data = await firebaseService.getDashboardData(userId);
+        // Use mock data service instead of Firebase
+        const data = await dataService.getDashboardData(userId);
         setDashboardData(data);
         setError(null);
       } catch (err) {

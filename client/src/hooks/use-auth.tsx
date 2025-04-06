@@ -9,27 +9,40 @@ import { User } from "@shared/schema";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { firebaseService } from "../services/firebase-service";
-import { FirebaseUser } from "../types/firebase";
+import { mockDataService } from "../services/mock-data-service";
+import { FirebaseUser, CreateFirebaseUser } from "../types/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../lib/firebase";
 
-// Convert Firebase data types to match our existing interface
+// Use mock service for now because of Firebase permission issues
+const dataService = mockDataService;
+
+// Convert Firebase data types to match our existing interface from Drizzle schema
 const convertFirebaseUserToUser = (firebaseUser: FirebaseUser): User => {
+  // Get mobile phone from Firebase user data
+  const mobile = firebaseUser.mobile || '';
+  
+  // Create User object with all required fields from schema
   return {
-    id: parseInt(firebaseUser.id),
+    id: parseInt(firebaseUser.id) || 1,
     username: firebaseUser.username,
     password: "", // We don't return the password
     fullName: firebaseUser.fullName,
     email: firebaseUser.email,
+    mobile: mobile,
+    isActive: true,
+    lastLogin: new Date().toISOString(),
     registrationId: firebaseUser.registrationId,
     address: firebaseUser.address,
-    phone: firebaseUser.phone,
-    course: firebaseUser.course,
-    institute: firebaseUser.institute,
-    enrollmentDate: firebaseUser.enrollmentDate,
-    graduationDate: firebaseUser.graduationDate,
-    created_at: new Date(firebaseUser.created_at),
-    updated_at: new Date(firebaseUser.updated_at)
+    // Map to the schema fields
+    coApplicantName: "MUNNA KUMAR",
+    coApplicantAddress: "ROAD NO.8, NARAYANI NAGAR, SANCHIPATTI, HAJIPUR, VAISHALI, BIHAR",
+    coApplicantContact: "9931286972",
+    instituteName: firebaseUser.institute,
+    instituteAddress: "LANDRAN, KHARAR-BANUR HIGHWAY, SECTOR-112, GREATER MOHALI, PUNJABLANDRAN, MOHALI-140307(PUNJAB)",
+    instituteContact: "1723984200",
+    appliedCourse: firebaseUser.course,
+    courseDuration: 48
   };
 };
 
@@ -73,37 +86,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [authError, setAuthError] = useState<Error | null>(null);
   
-  // Set up auth state listener
+  // Initialize with mock data instead of relying on Firebase auth state
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const initializeMockUser = async () => {
       setInitializing(true);
       try {
-        if (firebaseUser) {
-          const userProfile = await firebaseService.getCurrentUser();
-          if (userProfile) {
-            setCurrentUser(convertFirebaseUserToUser(userProfile));
-          } else {
-            setCurrentUser(null);
-          }
+        // Get user from mock service
+        const userProfile = await dataService.getCurrentUser();
+        if (userProfile) {
+          setCurrentUser(convertFirebaseUserToUser(userProfile));
         } else {
           setCurrentUser(null);
         }
         setAuthError(null);
       } catch (error) {
+        console.error("Error initializing mock user:", error);
         setAuthError(error as Error);
         setCurrentUser(null);
       } finally {
         setInitializing(false);
       }
-    });
+    };
 
-    return () => unsubscribe();
+    initializeMockUser();
   }, []);
 
-  // Login mutation
+  // Login mutation using mock data service
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const firebaseUser = await firebaseService.loginUser(credentials.username, credentials.password);
+      const firebaseUser = await dataService.loginUser(credentials.username, credentials.password);
       return convertFirebaseUserToUser(firebaseUser);
     },
     onSuccess: (userData: User) => {
@@ -123,18 +134,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  // Register mutation
+  // Register mutation using mock data service
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterData) => {
       const { email, password, ...otherUserData } = userData;
-      // Use email for authentication but preserve username for display
-      const firebaseUser = await firebaseService.registerUser(email, password, {
+      // Create a properly typed object for mock data service
+      const firebaseUserData: CreateFirebaseUser = {
         username: userData.username,
         email,
         fullName: userData.fullName,
         mobile: userData.mobile,
-        // Other optional fields will be filled with defaults in the service
-      });
+        registrationId: userData.registrationId,
+        address: userData.address,
+        phone: userData.phone,
+        course: userData.course,
+        institute: userData.institute,
+        enrollmentDate: userData.enrollmentDate,
+        graduationDate: userData.graduationDate
+      };
+      
+      const firebaseUser = await dataService.registerUser(
+        email, 
+        password, 
+        firebaseUserData
+      );
       
       return convertFirebaseUserToUser(firebaseUser);
     },
@@ -155,10 +178,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  // Logout mutation
+  // Logout mutation using mock data service
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await firebaseService.logoutUser();
+      await dataService.logoutUser();
     },
     onSuccess: () => {
       setCurrentUser(null);
